@@ -7,12 +7,12 @@ namespace SkumOgSandhed.Domain.Entities
         public int ReleaseYear { get; set; }
         public int DrinkingYear { get; set; }
         public decimal Abv { get; set; }
-        public string FoodPairing { get; set; }
-        public string Description { get; set; }
+        public string? FoodPairing { get; set; } = "Ingen";
+        public string? Description { get; set; } = "Ingen Beskrivelse";
         public string Fermentation { get; set; }
         public string YeastType { get; set; }
         public decimal Price { get; set; }
-        public decimal Rating { get; set; }
-        public decimal UntappdRating { get; set; }
+        public decimal? Rating { get; set; } = 0;
+        public decimal? UntappdRating { get; set; } = 0;
     }
 }
