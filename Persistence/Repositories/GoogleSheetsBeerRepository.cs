@@ -5,9 +5,6 @@ using System.Threading.Tasks;
 using SkumOgSandhed.Domain.Entities;
 using SkumOgSandhed.Domain.Interfaces;
 using SkumOgSandhed.Persistence.GoogleSheets;
-using Google.Apis.Sheets.v4;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
 
 namespace SkumOgSandhed.Persistence.Repositories
 {
