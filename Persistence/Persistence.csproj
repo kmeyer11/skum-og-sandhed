@@ -10,11 +10,11 @@
     <PackageReference Include="Google.Apis.Sheets.v4" Version="1.72.0.3966" />
   </ItemGroup>
   
-  <ItemGroup>
+  <!-- <ItemGroup>
     <None Update="client_secrets.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-  </ItemGroup>
+  </ItemGroup> -->
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
