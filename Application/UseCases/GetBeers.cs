@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SkumOgSandhed.Application.Interfaces;
+using SkumOgSandhed.Domain.Interfaces;
 using SkumOgSandhed.Domain.Entities;
 
 namespace SkumOgSandhed.Application.UseCases
 {
-    public class GetBeers : IGetBeers
+    public class GetBeers
     {
         private readonly IBeerRepository _beerRepository;
 
@@ -16,13 +16,9 @@ namespace SkumOgSandhed.Application.UseCases
             _beerRepository = beerRepository;
         }
 
-        public async Task<IReadOnlyList<Beer>> ExecuteAsync()
+        public Task<IReadOnlyList<Beer>> ExecuteAsync()
         {
-            var beers = await _beerRepository.GetAllAsync();
-
-            return beers;
+            return _beerRepository.GetBeersAsync();
         }
-
-
     }
 }

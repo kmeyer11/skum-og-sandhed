@@ -1,6 +1,7 @@
 using SkumOgSandhed.Application.UseCases;
-using SkumOgSandhed.Application.Interfaces;
 using SkumOgSandhed.Persistence.Repositories;
+using SkumOgSandhed.Persistence.GoogleSheets;
+using SkumOgSandhed.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +17,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Registrer DI for repository og use case
-builder.Services.AddScoped<IBeerRepository, InMemoryBeerRepository>();
-builder.Services.AddScoped<IGetBeers, GetBeers>();
+// --- Persistence DI ---
+builder.Services.AddSingleton(sp => new GoogleSheetsService(
+    "141LDJNA1KpJpEULTmpme4MhyJkoZ9fRHmbnqYH4EKfs"));
+builder.Services.AddSingleton<BeerLoaderService>();
+builder.Services.AddScoped<IBeerRepository, GoogleSheetsBeerRepository>();
+
+// --- Application DI ---
+builder.Services.AddScoped<GetBeers>();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -28,11 +34,11 @@ var app = builder.Build();
 app.UseCors(); // Brug CORS
 
 // --- Minimal API Endpoint ---
-app.MapGet("/api/beers", async (IGetBeers getBeers) =>
+app.MapGet("/api/beers", async (GetBeers useCase) =>
 {
     try
     {
-        var beers = await getBeers.ExecuteAsync();
+        var beers = await useCase.ExecuteAsync();
         return Results.Ok(beers);
     }
     catch (Exception ex)
@@ -40,6 +46,7 @@ app.MapGet("/api/beers", async (IGetBeers getBeers) =>
         return Results.Problem(ex.Message);
     }
 });
+
 
 // --- Run app ---
 app.Run();

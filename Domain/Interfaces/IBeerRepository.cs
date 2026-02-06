@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using SkumOgSandhed.Domain.Entities;
 
-namespace SkumOgSandhed.Application.UseCases
+namespace SkumOgSandhed.Domain.Interfaces
 {
-    public interface IGetBeers
+    public interface IBeerRepository
     {
-        Task<IReadOnlyList<Beer>> ExecuteAsync();
+        Task<IReadOnlyList<Beer>> GetBeersAsync();
     }
 }
