@@ -13,13 +13,10 @@ namespace SkumOgSandhed.Persistence.GoogleSheets
         private readonly SheetsService _service;
         private readonly string _spreadsheetId;
 
-        public GoogleSheetsService(string spreadsheetId, string clientSecretPath)
+        public GoogleSheetsService(string spreadSheetId)
         {
-            _spreadsheetId = spreadsheetId;
-
-            GoogleCredential credential;
-            using var stream = new FileStream(clientSecretPath, FileMode.Open, FileAccess.Read);
-            credential = GoogleCredential.FromStream(stream)
+            GoogleCredential credential = GoogleCredential
+                .GetApplicationDefault()
                 .CreateScoped(SheetsService.Scope.SpreadsheetsReadonly);
 
             _service = new SheetsService(new BaseClientService.Initializer
@@ -27,7 +24,11 @@ namespace SkumOgSandhed.Persistence.GoogleSheets
                 HttpClientInitializer = credential,
                 ApplicationName = "SkumOgSandhed"
             });
+
+            _spreadsheetId = spreadSheetId;
         }
+
+        public string SpreadsheetId { get; }
 
         public async Task<IList<IList<object>>> GetRangeAsync(string range)
         {

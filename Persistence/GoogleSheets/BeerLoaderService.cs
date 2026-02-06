@@ -20,13 +20,6 @@ namespace SkumOgSandhed.Persistence.GoogleSheets
             // 1. Load base beers
             var beers = await LoadBaseBeers();
 
-            // 2. Load relation sheets and add string lists
-            await LoadStringRelations(beers, "Beer_Breweries", row => row[1].ToString(), (beer, value) => beer.Breweries.Add(value));
-            await LoadStringRelations(beers, "Beer_Hops", row => row[1].ToString(), (beer, value) => beer.Hops.Add(value));
-            await LoadStringRelations(beers, "Beer_Malts", row => row[1].ToString(), (beer, value) => beer.Malts.Add(value));
-            await LoadStringRelations(beers, "Beer_Adjuncts", row => row[1].ToString(), (beer, value) => beer.Adjuncts.Add(value));
-            await LoadStringRelations(beers, "Beer_BeerTypes", row => row[1].ToString(), (beer, value) => beer.Types.Add(value));
-
             return beers.Values.ToList();
         }
 
@@ -34,31 +27,63 @@ namespace SkumOgSandhed.Persistence.GoogleSheets
         {
             var rows = await _sheets.GetRangeAsync("Beers_Input!A2:Q");
             var dict = new Dictionary<int, Beer>();
-            foreach (var row in rows)
-            {
-                dict.Add(int.Parse(row[0].ToString()), new Beer
-                {
-                    BeerId = int.Parse(row[0].ToString()),
-                    Name = row[1].ToString()
-                });
-            }
-            return dict;
-        }
 
-        private async Task LoadStringRelations(Dictionary<int, Beer> beers, string sheet, Func<IList<object>, string> factory, Action<Beer, string> add)
-        {
-            var rows = await _sheets.GetRangeAsync($"{sheet}!A2:B");
             foreach (var row in rows)
             {
                 if (row.Count < 2) continue;
+                if (!int.TryParse(row[0]?.ToString(), out var id)) continue;
 
-                var beerId = int.Parse(row[0].ToString());
-                var value = factory(row);
+                var beer = new Beer
+                {
+                    BeerId = id,
+                    Name = GetString(row, 1),
 
-                if (!beers.TryGetValue(beerId, out var beer)) continue;
+                    Breweries = SplitList(row, 2),
+                    ReleaseYear = GetInt(row, 3),
+                    DrinkingYear = GetInt(row, 4),
+                    Abv = GetDecimal(row, 5),
 
-                add(beer, value);
+                    FoodPairing = GetString(row, 6) ?? "Ingen",
+                    Description = GetString(row, 7) ?? "Ingen Beskrivelse",
+
+                    Fermentation = GetString(row, 8),
+                    YeastType = GetString(row, 9),
+
+                    Price = GetDecimal(row, 10),
+                    Rating = GetInt(row, 11),
+                    UntappdRating = GetDecimal(row, 12),
+
+                    Hops = SplitList(row, 13),
+                    Malts = SplitList(row, 14),
+                    Adjuncts = SplitList(row, 15),
+                    Types = SplitList(row, 16)
+                };
+
+                dict[id] = beer;
             }
+
+            return dict;
         }
+
+        private static string? GetString(IList<object> row, int i) =>
+        i < row.Count ? row[i]?.ToString() : null;
+
+        private static int GetInt(IList<object> row, int i) =>
+            i < row.Count && int.TryParse(row[i]?.ToString(), out var v) ? v : 0;
+
+        private static double GetDouble(IList<object> row, int i) =>
+            i < row.Count && double.TryParse(row[i]?.ToString(), out var v) ? v : 0;
+
+        private static decimal GetDecimal(IList<object> row, int i) =>
+            i < row.Count && decimal.TryParse(row[i]?.ToString(), out var v) ? v : 0;
+
+        private static List<string> SplitList(IList<object> row, int i) =>
+            i < row.Count && !string.IsNullOrWhiteSpace(row[i]?.ToString())
+                ? row[i]!.ToString()!
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .ToList()
+                : new List<string>();
+
     }
 }

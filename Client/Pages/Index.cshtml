@@ -27,16 +27,20 @@
     </thead>
 </table>
 
+
 @section Scripts {
-    <!-- DataTables JS -->
+    <!-- jQuery (REQUIRED) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#beerTable').DataTable({
             ajax: {
-                url: 'http://localhost:5234/api/beers', // API port
-                dataSrc: '' // fordi API returnerer et array
+                url: 'http://localhost:5234/api/beers',
+                dataSrc: ''
             },
             columns: [
                 { data: 'name' },
@@ -53,3 +57,4 @@
     });
     </script>
 }
+

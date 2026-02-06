@@ -19,8 +19,7 @@ builder.Services.AddCors(options =>
 
 // --- Persistence DI ---
 builder.Services.AddSingleton(sp => new GoogleSheetsService(
-    "141LDJNA1KpJpEULTmpme4MhyJkoZ9fRHmbnqYH4EKfs",
-    Path.Combine("..", "client_secrets.json")));
+    "141LDJNA1KpJpEULTmpme4MhyJkoZ9fRHmbnqYH4EKfs"));
 builder.Services.AddSingleton<BeerLoaderService>();
 builder.Services.AddScoped<IBeerRepository, GoogleSheetsBeerRepository>();
 
