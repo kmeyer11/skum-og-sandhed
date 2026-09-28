@@ -8,6 +8,9 @@
   --amber-deep: #B8741C;
   --hop: #A9BF6A;
   --gutter: max(16px, calc((100% - 1160px) / 2));
+  /* Grafserier, valideret for farveblindhed og kontrast mod --bottle-raised. Ravet er mørkere end --amber, så det kan bære små mærker. */
+  --series-1: #c98500;
+  --series-2: #3987e5;
 }
 
 * { box-sizing: border-box; }
@@ -134,5 +137,94 @@ dialog.beer[open] { animation: pourIn .25s ease-out; }
 .tag { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: .85rem; }
 .tag.hop { border-color: var(--hop); color: var(--hop); }
 .none { color: var(--foam-soft); }
+
+/* Topnavigation mellem arkivet og statistikken. */
+.site-nav {
+  display: flex; align-items: center; gap: 4px 20px; flex-wrap: wrap;
+  padding: 10px var(--gutter); background: var(--bottle); border-bottom: 1px solid var(--line);
+}
+.site-nav a { color: var(--foam-soft); text-decoration: none; font-weight: 500; padding: 4px 0; border-bottom: 2px solid transparent; }
+.site-nav a:hover { color: var(--foam); }
+.site-nav a[aria-current="page"] { color: var(--foam); border-bottom-color: var(--amber); }
+.site-nav .home { display: flex; align-items: center; gap: 8px; margin-right: auto; color: var(--foam); font-family: 'Young Serif', serif; font-weight: 400; border: none; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Statistiksiden */
+.pour.short { padding-bottom: 56px; }
+.pour.short h1 { font-size: clamp(2.6rem, 8vw, 5.5rem); }
+
+.stats { padding: 32px var(--gutter) 80px; }
+.stats-status { color: var(--foam-soft); }
+.year-picker {
+  position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 12px 0; margin-bottom: 20px; background: var(--bottle); border-bottom: 1px solid var(--line);
+}
+.chip {
+  font: inherit; font-weight: 500; color: var(--foam); background: var(--bottle-raised);
+  border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; cursor: pointer;
+}
+.chip:hover { border-color: var(--foam-soft); }
+.chip[aria-pressed="true"] { background: var(--amber); border-color: var(--amber); color: var(--bottle); }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.kpi { background: var(--bottle-raised); border: 1px solid var(--line); border-radius: 6px; padding: 16px 16px 12px; display: flex; flex-direction: column; }
+.kpi-label { color: var(--foam-soft); font-size: .9rem; }
+.kpi-value { font-family: 'Young Serif', serif; font-size: clamp(1.5rem, 5vw, 2.1rem); line-height: 1.15; margin: 4px 0; font-variant-numeric: tabular-nums; }
+.kpi-note { color: var(--foam-soft); font-size: .85rem; flex: 1; }
+.kpi .delta { display: block; color: var(--foam); }
+.spark { width: 120px; max-width: 100%; height: 32px; margin-top: 10px; overflow: visible; }
+.spark path { fill: none; stroke: var(--foam-soft); stroke-width: 1.5; stroke-linejoin: round; }
+.spark circle { fill: var(--foam-soft); }
+.spark circle.hl { fill: var(--series-1); stroke: var(--bottle-raised); stroke-width: 2; }
+
+.stat-section { margin-top: 56px; }
+.stat-section > h2 { margin: 0 0 4px; font-size: 1.8rem; }
+.stat-section > h2 small { font-family: 'Instrument Sans', sans-serif; font-size: .95rem; color: var(--foam-soft); margin-left: 8px; }
+.section-lede { margin: 0 0 20px; color: var(--foam-soft); max-width: 70ch; }
+.sub-head { margin: 28px 0 10px; font-size: 1.2rem; }
+
+.chart-grid, .list-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+.chart-card, .rank-card { margin: 0; min-width: 0; background: var(--bottle-raised); border: 1px solid var(--line); border-radius: 6px; padding: 18px; }
+.chart-card.wide { grid-column: 1 / -1; }
+.chart-card figcaption h3, .rank-card h3 { margin: 0; font-size: 1.15rem; }
+.chart-card figcaption p, .rank-note { margin: 2px 0 12px; color: var(--foam-soft); font-size: .9rem; }
+.chart-box { position: relative; height: 280px; }
+.chart-box.square { height: min(440px, 80vw); }
+
+.rank { list-style: none; margin: 8px 0 0; padding: 0; counter-reset: rank; }
+.rank li { counter-increment: rank; border-top: 1px solid var(--line); }
+.rank li:first-child { border-top: none; }
+.rank-item {
+  display: grid; grid-template-columns: 1.6em 1fr auto; gap: 10px; align-items: baseline; width: 100%;
+  padding: 10px 0; background: none; border: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.rank-item::before { content: counter(rank); color: var(--foam-soft); font-variant-numeric: tabular-nums; }
+.rank-item.static { cursor: default; }
+button.rank-item:hover .rank-name { color: var(--amber); }
+.rank-name { font-family: 'Young Serif', serif; font-size: 1.05rem; line-height: 1.3; min-width: 0; overflow-wrap: anywhere; }
+.rank-name small { display: block; font-family: 'Instrument Sans', sans-serif; font-size: .85rem; color: var(--foam-soft); }
+.rank-value { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rank .empty { padding: 10px 0; color: var(--foam-soft); }
+
+.table-scroll { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+table.data th, table.data td { padding: 10px; border-top: 1px solid var(--line); text-align: left; vertical-align: baseline; }
+table.data thead th { border-top: none; color: var(--foam-soft); font-weight: 500; font-size: .9rem; white-space: nowrap; }
+table.data tbody th { font-weight: 500; white-space: nowrap; }
+table.data .num { text-align: right; }
+table.data .muted { color: var(--foam-soft); }
+table.data .strong { font-weight: 600; }
+table.data tr.total th, table.data tr.total td { border-top: 2px solid var(--foam-soft); font-weight: 600; }
+table.winners td:not(.num) { font-family: 'Young Serif', serif; }
+table.heat td.heat-cell { background: rgba(201, 133, 0, var(--a)); border: 2px solid var(--bottle-raised); border-radius: 4px; text-align: center; min-width: 56px; }
+#coverage td.heat-cell { border-color: var(--bottle); }
+button.link { background: none; border: none; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+button.link:hover { color: var(--amber); text-decoration-color: var(--amber); }
+
+.as-table { margin-top: 16px; }
+.as-table summary { cursor: pointer; color: var(--foam-soft); font-weight: 500; }
+.as-table summary:hover { color: var(--foam); }
+.as-table[open] summary { margin-bottom: 8px; }
 
 .site-footer { padding: 24px var(--gutter); color: var(--foam-soft); font-size: .9rem; border-top: 1px solid var(--line); }
