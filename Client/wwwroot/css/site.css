@@ -97,12 +97,6 @@ h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; font-weight: 400; }
 #beerTable td.dataTables_empty { text-align: center; color: var(--foam-soft); cursor: default; }
 
 .dt-foot { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--line); color: var(--foam-soft); font-size: .9rem; }
-.dataTables_paginate { display: flex; gap: 4px; }
-.dataTables_paginate .paginate_button {
-  color: var(--foam); padding: 4px 10px; border-radius: 999px; cursor: pointer; border: 1px solid transparent;
-}
-.dataTables_paginate .paginate_button.current { border-color: var(--amber); color: var(--amber); }
-.dataTables_paginate .paginate_button.disabled { color: var(--line); cursor: default; }
 .dataTables_processing { display: none !important; }
 
 /* To glas side om side: Røverne i rav, Untappd i skum. Fyldhøjden er ratingen ud af 5. */
