@@ -1,0 +1,19 @@
+@page
+@model PejsModel
+@{
+    ViewData["Title"] = "Pejsen";
+    ViewData["BodyClass"] = "pejs";
+}
+
+<main class="hearth" id="hearth">
+    <h1 class="sr-only">Pejsen</h1>
+    <canvas id="fire" width="192" height="108" data-badge="@Url.Content("~/img/roeverne-maerke.svg")" role="img" aria-label="En knitrende pejs i pixelart med Røvernes mærke over kaminhylden"></canvas>
+    <div class="hearth-controls">
+        <button type="button" id="soundBtn" aria-pressed="false">Tænd knitren</button>
+        <button type="button" id="fullscreenBtn">Fuld skærm</button>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/pejs.js" asp-append-version="true"></script>
+}

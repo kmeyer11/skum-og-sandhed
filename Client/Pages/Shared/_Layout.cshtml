@@ -12,12 +12,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
+<body class="@ViewData["BodyClass"]">
     @{ var currentPage = ViewContext.RouteData.Values["page"] as string; }
     <nav class="site-nav" aria-label="Hovedmenu">
         <a class="home" href="~/"><img src="~/img/roeverne-ikon.svg" alt="" width="28" height="28">Skum og Sandhed</a>
         <a href="~/" aria-current="@(currentPage == "/Index" ? "page" : null)">Arkivet</a>
         <a href="~/Statistik" aria-current="@(currentPage == "/Statistik" ? "page" : null)">Statistik</a>
+        <a href="~/Pejs" aria-current="@(currentPage == "/Pejs" ? "page" : null)">Pejsen</a>
     </nav>
 
     @RenderBody()
