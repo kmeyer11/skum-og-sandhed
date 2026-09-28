@@ -417,3 +417,6 @@ FodyWeavers.xsd
 *.msm
 *.msp
 client_secrets.json
+google-credentials.json
+*-credentials.json
+.env

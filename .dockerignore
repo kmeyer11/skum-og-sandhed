@@ -1,0 +1,12 @@
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/.DS_Store
+**/*.user
+google-credentials.json
+client_secrets.json
+.env
+**/appsettings.*.json
+!**/appsettings.json

@@ -1,25 +1,50 @@
+using SkumOgSandhed.Application.UseCases;
+using SkumOgSandhed.Domain.Interfaces;
+using SkumOgSandhed.Persistence.GoogleSheets;
+using SkumOgSandhed.Persistence.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorPages();
+
+var spreadsheetId = builder.Configuration["GoogleSheets:SpreadsheetId"]
+    ?? throw new InvalidOperationException("GoogleSheets:SpreadsheetId mangler i konfigurationen.");
+
+builder.Services.AddSingleton(_ => new GoogleSheetsService(spreadsheetId));
+builder.Services.AddSingleton<BeerLoaderService>();
+builder.Services.AddScoped<IBeerRepository, GoogleSheetsBeerRepository>();
+builder.Services.AddScoped<GetBeers>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+var listenUrls = builder.Configuration["ASPNETCORE_URLS"] ?? string.Empty;
+if (app.Environment.IsDevelopment() || listenUrls.Contains("https", StringComparison.OrdinalIgnoreCase))
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.MapGet("/api/beers", async (GetBeers useCase) =>
+{
+    try
+    {
+        var beers = await useCase.ExecuteAsync();
+        return Results.Ok(beers);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
 
 app.Run();
