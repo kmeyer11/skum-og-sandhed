@@ -228,3 +228,29 @@ button.link:hover { color: var(--amber); text-decoration-color: var(--amber); }
 .as-table[open] summary { margin-bottom: 8px; }
 
 .site-footer { padding: 24px var(--gutter); color: var(--foam-soft); font-size: .9rem; border-top: 1px solid var(--line); }
+
+/* Pejsen: hele siden er stuen, og lærredet skaleres op uden udglatning, så pixelkunsten står skarpt på en storskærm. */
+body.pejs { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+body.pejs .site-footer { display: none; }
+.hearth {
+  position: relative; flex: 1; min-height: 0;
+  display: grid; place-items: center;
+  background: #0d0806; container-type: size;
+}
+.hearth canvas {
+  display: block; width: min(100cqw, 100cqh * 16 / 9); aspect-ratio: 16 / 9;
+  image-rendering: pixelated;
+}
+.hearth-controls {
+  position: absolute; right: 16px; bottom: 16px; display: flex; gap: 8px;
+  transition: opacity .6s;
+}
+.hearth-controls button {
+  background: rgba(42, 26, 18, .85); color: var(--foam); border: 1px solid var(--line);
+  border-radius: 999px; padding: 8px 16px; font: inherit; cursor: pointer;
+}
+.hearth-controls button:hover, .hearth-controls button[aria-pressed="true"] { border-color: var(--amber); }
+.hearth-controls button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+/* Når ingen rører musen, forsvinder knapper og markør, så kun ilden er tilbage. */
+.hearth.idle { cursor: none; }
+.hearth.idle .hearth-controls { opacity: 0; pointer-events: none; }
