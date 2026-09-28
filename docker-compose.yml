@@ -1,0 +1,14 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8008:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/google-credentials.json
+      GoogleSheets__SpreadsheetId: ${GOOGLE_SHEETS_SPREADSHEET_ID:-141LDJNA1KpJpEULTmpme4MhyJkoZ9fRHmbnqYH4EKfs}
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS:-./google-credentials.json}:/secrets/google-credentials.json:ro

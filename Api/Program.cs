@@ -1,39 +1,37 @@
 using SkumOgSandhed.Application.UseCases;
-using SkumOgSandhed.Persistence.Repositories;
-using SkumOgSandhed.Persistence.GoogleSheets;
 using SkumOgSandhed.Domain.Interfaces;
+using SkumOgSandhed.Persistence.GoogleSheets;
+using SkumOgSandhed.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Services ---
-// Tilføj CORS for at tillade Client på en anden port
+var corsOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>()
+    ?? new[] { "http://localhost:5216", "http://localhost:8008" };
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:5216") // Client port
+        policy.WithOrigins(corsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-// --- Persistence DI ---
-builder.Services.AddSingleton(sp => new GoogleSheetsService(
-    "141LDJNA1KpJpEULTmpme4MhyJkoZ9fRHmbnqYH4EKfs"));
+var spreadsheetId = builder.Configuration["GoogleSheets:SpreadsheetId"]
+    ?? throw new InvalidOperationException("GoogleSheets:SpreadsheetId mangler i konfigurationen.");
+
+builder.Services.AddSingleton(_ => new GoogleSheetsService(spreadsheetId));
 builder.Services.AddSingleton<BeerLoaderService>();
 builder.Services.AddScoped<IBeerRepository, GoogleSheetsBeerRepository>();
-
-// --- Application DI ---
 builder.Services.AddScoped<GetBeers>();
 
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
-// --- Middleware ---
-app.UseCors(); // Brug CORS
+app.UseCors();
 
-// --- Minimal API Endpoint ---
 app.MapGet("/api/beers", async (GetBeers useCase) =>
 {
     try
@@ -47,6 +45,4 @@ app.MapGet("/api/beers", async (GetBeers useCase) =>
     }
 });
 
-
-// --- Run app ---
 app.Run();
