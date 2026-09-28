@@ -13,6 +13,13 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    @{ var currentPage = ViewContext.RouteData.Values["page"] as string; }
+    <nav class="site-nav" aria-label="Hovedmenu">
+        <a class="home" href="~/"><img src="~/img/roeverne-ikon.svg" alt="" width="28" height="28">Skum og Sandhed</a>
+        <a href="~/" aria-current="@(currentPage == "/Index" ? "page" : null)">Arkivet</a>
+        <a href="~/Statistik" aria-current="@(currentPage == "/Statistik" ? "page" : null)">Statistik</a>
+    </nav>
+
     @RenderBody()
 
     <footer class="site-footer">Data fra Røvernes regneark.</footer>
