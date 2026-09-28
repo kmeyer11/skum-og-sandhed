@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using SkumOgSandhed.Domain.Entities;
@@ -50,7 +51,7 @@ namespace SkumOgSandhed.Persistence.GoogleSheets
                     YeastType = GetString(row, 9),
 
                     Price = GetDecimal(row, 10),
-                    Rating = GetInt(row, 11),
+                    Rating = GetDecimal(row, 11),
                     UntappdRating = GetDecimal(row, 12),
 
                     Hops = SplitList(row, 13),
@@ -74,8 +75,9 @@ namespace SkumOgSandhed.Persistence.GoogleSheets
         private static double GetDouble(IList<object> row, int i) =>
             i < row.Count && double.TryParse(row[i]?.ToString(), out var v) ? v : 0;
 
+        // Arket bruger dansk decimalkomma ("10,5"); med kulturneutral parsing blev kommaet læst som tusindtalsseparator.
         private static decimal GetDecimal(IList<object> row, int i) =>
-            i < row.Count && decimal.TryParse(row[i]?.ToString(), out var v) ? v : 0;
+            i < row.Count && decimal.TryParse(row[i]?.ToString()?.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : 0;
 
         private static List<string> SplitList(IList<object> row, int i) =>
             i < row.Count && !string.IsNullOrWhiteSpace(row[i]?.ToString())

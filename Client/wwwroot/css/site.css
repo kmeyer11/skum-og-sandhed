@@ -1,22 +1,144 @@
-html {
-  font-size: 14px;
+:root {
+  --bottle: #2A1A12;
+  --bottle-raised: #35231A;
+  --line: #4E3627;
+  --foam: #F2E6CF;
+  --foam-soft: #BFA98C;
+  --amber: #E0A33A;
+  --amber-deep: #B8741C;
+  --hop: #A9BF6A;
+  --gutter: max(16px, calc((100% - 1160px) / 2));
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
 body {
-  margin-bottom: 60px;
+  margin: 0;
+  background: var(--bottle);
+  color: var(--foam);
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
 }
+h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; font-weight: 400; }
+
+/* Heroen er selve glasset: skumtop over en ravfarvet skænk. */
+.pour {
+  position: relative;
+  padding: 88px var(--gutter) 72px;
+  background:
+    radial-gradient(ellipse 60% 80% at 70% 110%, rgba(255, 210, 120, .35), transparent 70%),
+    linear-gradient(180deg, var(--amber) 0%, var(--amber-deep) 100%);
+  color: var(--bottle);
+  overflow: hidden;
+}
+.pour::before, .pour::after { content: ""; position: absolute; left: 0; right: 0; }
+.pour::before { top: 0; height: 36px; background: var(--foam); }
+.pour::after {
+  top: 36px; height: 18px;
+  background: radial-gradient(circle at 18px 0, var(--foam) 17px, transparent 18px) 0 0 / 36px 18px repeat-x;
+}
+.bubbles span {
+  position: absolute; bottom: -10px; border-radius: 50%;
+  background: rgba(255, 245, 220, .55);
+  animation: rise linear infinite;
+}
+@keyframes rise { to { transform: translateY(-360px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bubbles { display: none; } }
+/* Mærket sidder skævt som et påsyet spejdermærke. */
+.pour .badge {
+  position: absolute; right: var(--gutter); top: 50%;
+  width: clamp(96px, 20vw, 220px); height: auto;
+  transform: translateY(-40%) rotate(-8deg);
+  filter: drop-shadow(0 6px 14px rgba(42, 26, 18, .35));
+}
+@media (max-width: 640px) {
+  .pour .badge { top: 64px; transform: rotate(-8deg); }
+  .pour { padding-top: 172px; }
+  .pour h1 { max-width: none; }
+}
+.pour p { position: relative; margin: 0 0 6px; font-size: 1.05rem; font-weight: 500; }
+.pour h1 {
+  position: relative;
+  max-width: calc(100% - clamp(96px, 20vw, 220px) - 24px);
+  margin: 0;
+  font-size: clamp(3rem, 10vw, 7.5rem);
+  line-height: .95;
+  letter-spacing: -.01em;
+}
+.pour .lede { max-width: 46ch; margin-top: 18px; }
+
+.archive { padding: 40px var(--gutter) 80px; }
+.tools { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; margin-bottom: 20px; }
+.tools h2 { margin: 0; font-size: 1.6rem; }
+.tools h2 small { font-family: 'Instrument Sans', sans-serif; font-size: .95rem; color: var(--foam-soft); margin-left: 8px; }
+.search {
+  background: var(--bottle-raised); border: 1px solid var(--line); color: var(--foam);
+  padding: 10px 14px; border-radius: 999px; font: inherit; min-width: min(280px, 100%);
+}
+.search::placeholder { color: var(--foam-soft); }
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+.table-wrap { overflow-x: auto; border-top: 1px solid var(--line); }
+#beerTable { width: 100% !important; border-collapse: collapse; min-width: 860px; font-variant-numeric: tabular-nums; }
+#beerTable th {
+  text-align: left; font-weight: 500; color: var(--foam-soft); font-size: .9rem;
+  padding: 14px 10px; cursor: pointer; white-space: nowrap;
+}
+#beerTable th.sorting_asc, #beerTable th.sorting_desc { color: var(--foam); }
+#beerTable th.sorting_asc::after { content: " ↑"; color: var(--amber); }
+#beerTable th.sorting_desc::after { content: " ↓"; color: var(--amber); }
+#beerTable td { padding: 14px 10px; border-top: 1px solid var(--line); vertical-align: middle; }
+#beerTable tbody tr { cursor: pointer; }
+#beerTable tbody tr:hover { background: var(--bottle-raised); }
+#beerTable td.name { font-family: 'Young Serif', serif; font-size: 1.1rem; }
+#beerTable td.name span { display: block; font-family: 'Instrument Sans', sans-serif; font-size: .85rem; color: var(--foam-soft); }
+#beerTable .num { text-align: right; }
+#beerTable td.dataTables_empty { text-align: center; color: var(--foam-soft); cursor: default; }
+
+.dt-foot { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid var(--line); color: var(--foam-soft); font-size: .9rem; }
+.dataTables_paginate { display: flex; gap: 4px; }
+.dataTables_paginate .paginate_button {
+  color: var(--foam); padding: 4px 10px; border-radius: 999px; cursor: pointer; border: 1px solid transparent;
+}
+.dataTables_paginate .paginate_button.current { border-color: var(--amber); color: var(--amber); }
+.dataTables_paginate .paginate_button.disabled { color: var(--line); cursor: default; }
+.dataTables_processing { display: none !important; }
+
+/* To glas side om side: Røverne i rav, Untappd i skum. Fyldhøjden er ratingen ud af 5. */
+.glasses { display: flex; gap: 10px; align-items: end; }
+.glass { display: flex; align-items: end; gap: 6px; font-size: .9rem; }
+.glass i {
+  width: 14px; height: 26px; border: 1.5px solid var(--foam-soft); border-top: none; border-radius: 0 0 3px 3px;
+  background: linear-gradient(to top, var(--fill) var(--h), transparent var(--h));
+}
+.glass.r i { --fill: var(--amber); }
+.glass.u i { --fill: var(--foam); }
+.glass.u { color: var(--foam-soft); }
+
+dialog.beer {
+  border: none; padding: 0; max-width: min(720px, calc(100% - 32px)); width: 100%;
+  background: var(--bottle-raised); color: var(--foam); border-radius: 6px;
+}
+dialog.beer::backdrop { background: rgba(20, 10, 5, .75); }
+dialog.beer[open] { animation: pourIn .25s ease-out; }
+@keyframes pourIn { from { transform: translateY(12px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { dialog.beer[open] { animation: none; } }
+.d-head { padding: 28px 56px 20px 28px; background: var(--amber); color: var(--bottle); position: relative; }
+.d-head h3 { margin: 0; font-size: 2rem; line-height: 1.1; }
+.d-head p { margin: 4px 0 0; }
+.d-close { position: absolute; top: 14px; right: 14px; background: none; border: none; font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--bottle); }
+.d-body { padding: 24px 28px 28px; }
+.d-body blockquote { margin: 0 0 20px; font-family: 'Young Serif', serif; font-size: 1.15rem; line-height: 1.5; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; margin: 0 0 20px; }
+.facts div { border-top: 1px solid var(--line); padding-top: 8px; }
+.facts dt { color: var(--foam-soft); font-size: .85rem; }
+.facts dd { margin: 0; font-size: 1.1rem; }
+.ing { display: grid; grid-template-columns: 110px 1fr; gap: 8px 12px; align-items: baseline; margin: 0; }
+.ing dt { color: var(--foam-soft); font-size: .9rem; }
+.ing dd { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: .85rem; }
+.tag.hop { border-color: var(--hop); color: var(--hop); }
+.none { color: var(--foam-soft); }
+
+.site-footer { padding: 24px var(--gutter); color: var(--foam-soft); font-size: .9rem; border-top: 1px solid var(--line); }
