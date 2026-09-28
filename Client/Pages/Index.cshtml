@@ -69,17 +69,16 @@
 
         var table = $('#beerTable').DataTable({
             ajax: { url: '/api/beers', dataSrc: '' },
-            dom: 't<"dt-foot"ip>',
-            pageLength: 25,
+            dom: 't<"dt-foot"i>',
+            paging: false,
             order: [[7, 'desc']],
             language: {
-                info: 'Viser _START_–_END_ af _TOTAL_',
+                info: 'Viser _TOTAL_ øl',
                 infoEmpty: 'Ingen øl',
                 infoFiltered: '(fundet blandt _MAX_)',
                 zeroRecords: 'Ingen øl matcher søgningen.',
                 emptyTable: 'Arket er tomt.',
-                loadingRecords: 'Henter øl fra arket…',
-                paginate: { previous: 'Forrige', next: 'Næste' }
+                loadingRecords: 'Henter øl fra arket…'
             },
             columns: [
                 {
