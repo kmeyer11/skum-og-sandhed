@@ -60,7 +60,6 @@ h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; font-weight: 400; }
   .pour { padding-top: 172px; }
   .pour h1 { max-width: none; }
 }
-.pour p { position: relative; margin: 0 0 6px; font-size: 1.05rem; font-weight: 500; }
 .pour h1 {
   position: relative;
   max-width: calc(100% - clamp(96px, 20vw, 220px) - 24px);
@@ -69,7 +68,6 @@ h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; font-weight: 400; }
   line-height: .95;
   letter-spacing: -.01em;
 }
-.pour .lede { max-width: 46ch; margin-top: 18px; }
 
 .archive { padding: 40px var(--gutter) 80px; }
 .tools { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; margin-bottom: 20px; }
