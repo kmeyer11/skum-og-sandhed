@@ -25,10 +25,17 @@ body {
 }
 h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; font-weight: 400; }
 
-/* Heroen er selve glasset: skumtop over en ravfarvet skænk. */
+/* Heroen er selve glasset: skumtop over en ravfarvet skænk.
+   Glasset er lige højt på alle sider (plads til to linjers overskrift),
+   så det ikke hopper, når man skifter side. */
 .pour {
+  --pour-top: 88px;
+  --pour-bottom: 72px;
+  --pour-h1: clamp(3rem, 10vw, 7.5rem);
   position: relative;
-  padding: 88px var(--gutter) 72px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  min-height: calc(var(--pour-top) + var(--pour-bottom) + 2 * .95 * var(--pour-h1));
+  padding: var(--pour-top) var(--gutter) var(--pour-bottom);
   background:
     radial-gradient(ellipse 60% 80% at 70% 110%, rgba(255, 210, 120, .35), transparent 70%),
     linear-gradient(180deg, var(--amber) 0%, var(--amber-deep) 100%);
@@ -57,14 +64,14 @@ h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; font-weight: 400; }
 }
 @media (max-width: 640px) {
   .pour .badge { top: 64px; transform: rotate(-8deg); }
-  .pour { padding-top: 172px; }
+  .pour { --pour-top: 172px; }
   .pour h1 { max-width: none; }
 }
 .pour h1 {
   position: relative;
   max-width: calc(100% - clamp(96px, 20vw, 220px) - 24px);
   margin: 0;
-  font-size: clamp(3rem, 10vw, 7.5rem);
+  font-size: var(--pour-h1);
   line-height: .95;
   letter-spacing: -.01em;
 }
@@ -149,7 +156,6 @@ dialog.beer[open] { animation: pourIn .25s ease-out; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* Statistiksiden */
-.pour.short { padding-bottom: 56px; }
 .pour.short h1 { font-size: clamp(2.6rem, 8vw, 5.5rem); }
 
 .stats { padding: 32px var(--gutter) 80px; }
