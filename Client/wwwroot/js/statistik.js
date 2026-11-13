@@ -32,7 +32,6 @@ $(function () {
             buildYearPicker();
             buildYearCharts();
             buildTypeCharts();
-            buildCoverage();
             render();
         })
         .fail(function () {
@@ -81,6 +80,7 @@ $(function () {
         renderKpis();
         renderLists();
         highlightScatters();
+        renderMembers();
         $('#topScope').text(selected === 'all' ? 'alle år' : selected);
         $('#winnersWrap').toggle(selected === 'all');
     }
@@ -175,14 +175,6 @@ $(function () {
         fillList('#bottomList', rated.length > 1 ? rated.slice(-n).reverse().map(b => rankItem(b, rating(b.rating))) : [],
             `For få Røverne-ratings${where} i arket.`);
 
-        var both = list.filter(b => hasRating(b) && hasUntappd(b))
-            .map(b => ({ b, diff: b.rating - b.untappdRating }));
-        fillList('#weLoved', both.filter(x => x.diff > 0).sort((a, b) => b.diff - a.diff).slice(0, 5)
-            .map(x => rankItem(x.b, signed(x.diff))),
-            both.length ? 'Ingen. Untappd var altid gladere end os.' : `Ingen øl med begge ratings${where}.`);
-        fillList('#worldLoved', both.filter(x => x.diff < 0).sort((a, b) => a.diff - b.diff).slice(0, 5)
-            .map(x => rankItem(x.b, signed(x.diff))),
-            both.length ? 'Ingen. Vi var altid gladere end Untappd.' : `Ingen øl med begge ratings${where}.`);
 
         var valued = list.filter(b => hasRating(b) && hasPrice(b));
         fillList('#bestValue', valued.map(b => ({ b, v: b.rating / b.price * 100 }))
@@ -220,6 +212,81 @@ $(function () {
                 return `<tr><th scope="row">${y}</th><td>${cell(best)}</td><td class="num">${rating(best.rating)}</td>` +
                     `<td>${cell(worst)}</td><td class="num">${rating(worst.rating)}</td></tr>`;
             }).join('') + '</tbody>');
+    }
+
+    // ---------- Medlemmer ----------
+
+    var memberName = m => m.charAt(0).toUpperCase() + m.slice(1);
+
+    function memberStats(list) {
+        var members = new Map();
+        list.forEach(b => Object.entries(b.memberRatings || {}).forEach(([m, r]) => {
+            var e = members.get(m) || { name: memberName(m), entries: [] };
+            e.entries.push({ b, r });
+            members.set(m, e);
+        }));
+        return [...members.values()].map(e => ({
+            ...e, avg: mean(e.entries.map(x => x.r)),
+            top: [...e.entries].sort((a, b) => b.r - a.r || (b.b.rating || 0) - (a.b.rating || 0)).slice(0, 3)
+        }));
+    }
+
+    function renderMembers() {
+        var where = selected === 'all' ? 'alle år' : selected;
+        var stats = memberStats(scope()).sort((a, b) => b.avg - a.avg);
+        $('#memberScope').text(where);
+        $('#memberWrap').prop('hidden', !stats.length);
+        $('#memberEmpty').prop('hidden', !!stats.length).text(`Ingen ratings pr. medlem for ${where} i arket.`);
+        if (!stats.length) return;
+
+        var group = mean(stats.flatMap(e => e.entries.map(x => x.r)));
+        var tile = (label, e) => `
+            <div class="kpi">
+                <div class="kpi-label">${label}</div>
+                <div class="kpi-value">${esc(e.name)}</div>
+                <div class="kpi-note">snit ${num(e.avg, 2)} på ${plural(e.entries.length, 'øl', 'øl')}
+                    <span class="delta">${signed(e.avg - group)} mod gruppens snit på ${num(group, 2)}</span></div>
+            </div>`;
+        $('#memberKpis').html(tile('Mest negative', stats[stats.length - 1]) + tile('Mest positive', stats[0]));
+
+        $('#memberTop').html(stats.map(e => `
+            <div class="rank-card"><h3>${esc(e.name)}</h3><p class="rank-note">Snit ${num(e.avg, 2)}</p>
+                <ol class="rank">${e.top.map(x => rankItem(x.b, rating(x.r))).join('')}</ol></div>`).join(''));
+
+        if (!window.Chart) return;
+        var data = {
+            labels: stats.map(e => e.name),
+            datasets: [{
+                data: stats.map(e => e.avg), n: stats.map(e => e.entries.length),
+                backgroundColor: color.roverne, hoverBackgroundColor: color.roverne,
+                borderRadius: { topRight: 4, bottomRight: 4 }, borderSkipped: 'left', barPercentage: .7
+            }]
+        };
+        document.getElementById('chartMembers').parentElement.style.height = Math.max(200, stats.length * 40 + 40) + 'px';
+        if (charts.members) {
+            charts.members.data = data;
+            charts.members.update();
+            return;
+        }
+        charts.members = new Chart(document.getElementById('chartMembers'), {
+            type: 'bar', data,
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    x: { min: 0, max: 5, ticks: { stepSize: 1, padding: 8 }, grid: axisGrid, border: { display: false } },
+                    y: { grid: noGrid, ticks: { color: color.ink } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: c => `Snit ${num(c.parsed.x, 2)}`,
+                            footer: items => plural(items[0].dataset.n[items[0].dataIndex], 'bedømt øl', 'bedømte øl')
+                        }
+                    }
+                }
+            }
+        });
     }
 
     $('#stats').on('click', '[data-id]', function () {
@@ -329,17 +396,14 @@ $(function () {
             ys.map(y => row(y)).join('') + row(all, true) + '</tbody>');
     }
 
-    function scatter(id, points, xAxis, yAxis, label, extraDatasets) {
+    function scatter(id, points, xAxis, yAxis, label) {
         return new Chart(document.getElementById(id), {
             type: 'scatter',
             data: {
-                datasets: [
-                    {
-                        data: points, backgroundColor: color.roverne, borderColor: color.surface, borderWidth: 2,
-                        pointRadius: 6, pointHoverRadius: 8, pointHitRadius: 10
-                    },
-                    ...(extraDatasets || [])
-                ]
+                datasets: [{
+                    data: points, backgroundColor: color.roverne, borderColor: color.surface, borderWidth: 2,
+                    pointRadius: 6, pointHoverRadius: 8, pointHitRadius: 10
+                }]
             },
             options: {
                 scales: {
@@ -349,34 +413,19 @@ $(function () {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        filter: c => c.datasetIndex === 0,
                         callbacks: {
                             title: items => items[0].raw.beer.name,
                             label: c => label(c.raw.beer)
                         }
                     }
                 },
-                onClick: (e, els) => {
-                    var el = els.find(x => x.datasetIndex === 0);
-                    if (el) openBeer(charts[id].data.datasets[0].data[el.index].beer);
-                },
-                onHover: (e, els) => { e.native.target.style.cursor = els.some(x => x.datasetIndex === 0) ? 'pointer' : ''; }
+                onClick: (e, els) => { if (els.length) openBeer(points[els[0].index].beer); },
+                onHover: (e, els) => { e.native.target.style.cursor = els.length ? 'pointer' : ''; }
             }
         });
     }
 
     function buildScatters() {
-        var both = beers.filter(b => hasRating(b) && hasUntappd(b));
-        charts.chartWorld = scatter('chartWorld',
-            both.map(b => ({ x: b.untappdRating, y: b.rating, beer: b })),
-            { min: 1, max: 5, title: { display: true, text: 'Untappd', color: color.muted } },
-            { min: 1, max: 5, title: { display: true, text: 'Røverne', color: color.muted } },
-            b => [`Røverne ${rating(b.rating)} · Untappd ${rating(b.untappdRating)}`, `${b.drinkingYear}`],
-            [{
-                type: 'line', data: [{ x: 1, y: 1 }, { x: 5, y: 5 }], borderColor: color.muted, borderWidth: 1,
-                borderDash: [4, 4], pointRadius: 0, pointHitRadius: 0, pointHoverRadius: 0
-            }]);
-
         var valued = beers.filter(b => hasRating(b) && hasPrice(b));
         charts.chartValue = scatter('chartValue',
             valued.map(b => ({ x: b.price, y: b.rating, beer: b })),
@@ -385,15 +434,13 @@ $(function () {
             b => [`${kr(b.price)} · rating ${rating(b.rating)}`, `${b.drinkingYear}`]);
     }
 
-    // Valgt år står frem i scatterplottene; resten tones ned men bliver.
+    // Valgt år står frem i scatterplottet; resten tones ned men bliver.
     function highlightScatters() {
-        ['chartWorld', 'chartValue'].forEach(id => {
-            var chart = charts[id];
-            if (!chart) return;
-            var ds = chart.data.datasets[0];
-            ds.backgroundColor = ds.data.map(p => selected === 'all' || p.beer.drinkingYear === selected ? color.roverne : color.line);
-            chart.update();
-        });
+        var chart = charts.chartValue;
+        if (!chart) return;
+        var ds = chart.data.datasets[0];
+        ds.backgroundColor = ds.data.map(p => selected === 'all' || p.beer.drinkingYear === selected ? color.roverne : color.line);
+        chart.update();
     }
 
     function buildTypeCharts() {
@@ -450,20 +497,8 @@ $(function () {
                 `<td class="num strong">${e.count}</td></tr>`).join('') + '</tbody>');
     }
 
-    function heatCell(v, max, fmt, title) {
+    function heatCell(v, max, fmt) {
         var a = max ? v / max : 0;
-        return `<td class="num heat-cell" style="--a:${(a * .85).toFixed(2)}"${title ? ` title="${title}"` : ''}>${fmt(v)}</td>`;
-    }
-
-    function buildCoverage() {
-        var fields = [
-            ['Røverne-rating', hasRating], ['Untappd', hasUntappd], ['Pris', hasPrice], ['ABV', hasAbv],
-            ['Beskrivelse', b => !!b.description], ['Gæring', b => !!b.fermentation]
-        ];
-        $('#coverage').html(`<thead><tr><th>Felt</th>${years.map(y => `<th class="num">${y}</th>`).join('')}</tr></thead><tbody>` +
-            fields.map(([name, has]) => `<tr><th scope="row">${name}</th>` + years.map(y => {
-                var list = inYear(y), n = list.filter(has).length, share = list.length ? n / list.length : 0;
-                return heatCell(share, 1, v => Math.round(v * 100) + ' %', `${n} af ${list.length} øl`);
-            }).join('') + '</tr>').join('') + '</tbody>');
+        return `<td class="num heat-cell" style="--a:${(a * .85).toFixed(2)}">${fmt(v)}</td>`;
     }
 });
