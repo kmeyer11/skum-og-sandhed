@@ -10,7 +10,12 @@
 <main class="archive">
     <div class="tools">
         <h2>Arkivet <small id="beerCount"></small></h2>
-        <input id="beerSearch" class="search" type="search" placeholder="Søg i navn, bryggeri eller type" aria-label="Søg">
+        <div class="filters">
+            <select id="yearFilter" class="search year-filter" aria-label="Druk år">
+                <option value="">Alle år</option>
+            </select>
+            <input id="beerSearch" class="search" type="search" placeholder="Søg i navn, bryggeri eller type" aria-label="Søg">
+        </div>
     </div>
     <div class="table-wrap">
         <table id="beerTable">
@@ -80,6 +85,10 @@
                 }
             ],
             createdRow: row => { row.tabIndex = 0; },
+            initComplete: function (settings, data) {
+                var years = [...new Set(data.map(b => b.drinkingYear).filter(y => y > 0))].sort((a, b) => b - a);
+                $('#yearFilter').append(years.map(y => `<option value="${y}">${y}</option>`).join(''));
+            },
             drawCallback: function () {
                 $('#beerCount').text(this.api().page.info().recordsDisplay + ' øl');
             }
@@ -90,6 +99,9 @@
         });
 
         $('#beerSearch').on('input', function () { table.search(this.value).draw(); });
+        $('#yearFilter').on('change', function () {
+            table.column(2).search(this.value ? `^${this.value}$` : '', true, false).draw();
+        });
 
         $('#beerTable tbody').on('click keydown', 'tr', function (e) {
             if (e.type === 'keydown' && e.key !== 'Enter') return;

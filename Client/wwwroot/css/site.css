@@ -85,6 +85,12 @@ h1, h2, h3 { font-family: 'Young Serif', Georgia, serif; font-weight: 400; }
   padding: 10px 14px; border-radius: 999px; font: inherit; min-width: min(280px, 100%);
 }
 .search::placeholder { color: var(--foam-soft); }
+.filters { flex: 1 1 auto; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+.year-filter {
+  min-width: 0; appearance: none; cursor: pointer; padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23BFA98C' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
 :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 
 .table-wrap { overflow-x: auto; border-top: 1px solid var(--line); }
