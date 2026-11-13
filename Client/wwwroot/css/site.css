@@ -194,7 +194,6 @@ dialog.beer[open] { animation: pourIn .25s ease-out; }
 .chart-card figcaption h3, .rank-card h3 { margin: 0; font-size: 1.15rem; }
 .chart-card figcaption p, .rank-note { margin: 2px 0 12px; color: var(--foam-soft); font-size: .9rem; }
 .chart-box { position: relative; height: 280px; }
-.chart-box.square { height: min(440px, 80vw); }
 
 .rank { list-style: none; margin: 8px 0 0; padding: 0; counter-reset: rank; }
 .rank li { counter-increment: rank; border-top: 1px solid var(--line); }
