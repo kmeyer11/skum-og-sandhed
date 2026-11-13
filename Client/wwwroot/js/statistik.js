@@ -80,6 +80,7 @@ $(function () {
         renderKpis();
         renderLists();
         highlightScatters();
+        renderMembers();
         $('#topScope').text(selected === 'all' ? 'alle år' : selected);
         $('#winnersWrap').toggle(selected === 'all');
     }
@@ -211,6 +212,81 @@ $(function () {
                 return `<tr><th scope="row">${y}</th><td>${cell(best)}</td><td class="num">${rating(best.rating)}</td>` +
                     `<td>${cell(worst)}</td><td class="num">${rating(worst.rating)}</td></tr>`;
             }).join('') + '</tbody>');
+    }
+
+    // ---------- Medlemmer ----------
+
+    var memberName = m => m.charAt(0).toUpperCase() + m.slice(1);
+
+    function memberStats(list) {
+        var members = new Map();
+        list.forEach(b => Object.entries(b.memberRatings || {}).forEach(([m, r]) => {
+            var e = members.get(m) || { name: memberName(m), entries: [] };
+            e.entries.push({ b, r });
+            members.set(m, e);
+        }));
+        return [...members.values()].map(e => ({
+            ...e, avg: mean(e.entries.map(x => x.r)),
+            top: [...e.entries].sort((a, b) => b.r - a.r || (b.b.rating || 0) - (a.b.rating || 0)).slice(0, 3)
+        }));
+    }
+
+    function renderMembers() {
+        var where = selected === 'all' ? 'alle år' : selected;
+        var stats = memberStats(scope()).sort((a, b) => b.avg - a.avg);
+        $('#memberScope').text(where);
+        $('#memberWrap').prop('hidden', !stats.length);
+        $('#memberEmpty').prop('hidden', !!stats.length).text(`Ingen ratings pr. medlem for ${where} i arket.`);
+        if (!stats.length) return;
+
+        var group = mean(stats.flatMap(e => e.entries.map(x => x.r)));
+        var tile = (label, e) => `
+            <div class="kpi">
+                <div class="kpi-label">${label}</div>
+                <div class="kpi-value">${esc(e.name)}</div>
+                <div class="kpi-note">snit ${num(e.avg, 2)} på ${plural(e.entries.length, 'øl', 'øl')}
+                    <span class="delta">${signed(e.avg - group)} mod gruppens snit på ${num(group, 2)}</span></div>
+            </div>`;
+        $('#memberKpis').html(tile('Mest negative', stats[stats.length - 1]) + tile('Mest positive', stats[0]));
+
+        $('#memberTop').html(stats.map(e => `
+            <div class="rank-card"><h3>${esc(e.name)}</h3><p class="rank-note">Snit ${num(e.avg, 2)}</p>
+                <ol class="rank">${e.top.map(x => rankItem(x.b, rating(x.r))).join('')}</ol></div>`).join(''));
+
+        if (!window.Chart) return;
+        var data = {
+            labels: stats.map(e => e.name),
+            datasets: [{
+                data: stats.map(e => e.avg), n: stats.map(e => e.entries.length),
+                backgroundColor: color.roverne, hoverBackgroundColor: color.roverne,
+                borderRadius: { topRight: 4, bottomRight: 4 }, borderSkipped: 'left', barPercentage: .7
+            }]
+        };
+        document.getElementById('chartMembers').parentElement.style.height = Math.max(200, stats.length * 40 + 40) + 'px';
+        if (charts.members) {
+            charts.members.data = data;
+            charts.members.update();
+            return;
+        }
+        charts.members = new Chart(document.getElementById('chartMembers'), {
+            type: 'bar', data,
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    x: { min: 0, max: 5, ticks: { stepSize: 1, padding: 8 }, grid: axisGrid, border: { display: false } },
+                    y: { grid: noGrid, ticks: { color: color.ink } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: c => `Snit ${num(c.parsed.x, 2)}`,
+                            footer: items => plural(items[0].dataset.n[items[0].dataIndex], 'bedømt øl', 'bedømte øl')
+                        }
+                    }
+                }
+            }
+        });
     }
 
     $('#stats').on('click', '[data-id]', function () {

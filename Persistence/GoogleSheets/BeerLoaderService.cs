@@ -18,10 +18,46 @@ namespace SkumOgSandhed.Persistence.GoogleSheets
 
         public async Task<IReadOnlyList<Beer>> LoadBeersAsync()
         {
-            // 1. Load base beers
-            var beers = await LoadBaseBeers();
+            var beersTask = LoadBaseBeers();
+            var ratingsTask = LoadMemberRatings();
+            var beers = await beersTask;
+
+            foreach (var (id, ratings) in await ratingsTask)
+            {
+                if (beers.TryGetValue(id, out var beer)) beer.MemberRatings = ratings;
+            }
 
             return beers.Values.ToList();
+        }
+
+        // Rating_Input har én kolonne pr. medlem efter beer_id; Mean og spread er formler, som stopper medlemslisten.
+        // Kun tomme celler er "ikke bedømt": arkets snit regner et 0 med, så det gør vi også.
+        private async Task<Dictionary<int, Dictionary<string, decimal>>> LoadMemberRatings()
+        {
+            var rows = await _sheets.GetRangeAsync("Rating_Input!A1:Z");
+            var result = new Dictionary<int, Dictionary<string, decimal>>();
+            if (rows.Count == 0) return result;
+
+            var members = rows[0].Skip(1)
+                .Select(c => c?.ToString()?.Trim() ?? "")
+                .TakeWhile(name => name != "" && !name.Equals("Mean", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            foreach (var row in rows.Skip(1))
+            {
+                if (row.Count < 2 || !int.TryParse(row[0]?.ToString(), out var id)) continue;
+
+                var ratings = new Dictionary<string, decimal>();
+                for (var i = 0; i < members.Count; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(GetString(row, i + 1))) continue;
+                    ratings[members[i]] = GetDecimal(row, i + 1);
+                }
+
+                if (ratings.Count > 0) result.TryAdd(id, ratings);
+            }
+
+            return result;
         }
 
         private async Task<Dictionary<int, Beer>> LoadBaseBeers()

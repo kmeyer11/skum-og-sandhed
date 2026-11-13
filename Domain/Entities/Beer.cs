@@ -21,5 +21,6 @@ namespace SkumOgSandhed.Domain.Entities
         public List<string> Malts { get; set; } = new();
         public List<string> Adjuncts { get; set; } = new();
         public List<string> Types { get; set; } = new();
+        public Dictionary<string, decimal> MemberRatings { get; set; } = new();
     }
 }

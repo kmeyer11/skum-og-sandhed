@@ -60,6 +60,23 @@
         </div>
     </section>
 
+    <section class="stat-section" aria-labelledby="memberHead">
+        <h2 id="memberHead">Hver Røver for sig <small id="memberScope"></small></h2>
+        <p class="section-lede">Ud fra den rating, hvert medlem selv har givet. Kun øl, hvor ratings pr. medlem er skrevet ind i arket.</p>
+        <p class="stats-status" id="memberEmpty" hidden></p>
+        <div id="memberWrap">
+            <div class="kpis" id="memberKpis"></div>
+            <div class="chart-grid">
+                <figure class="chart-card wide">
+                    <figcaption><h3>Snit pr. medlem</h3><p>Fra mildest til strengest, skala 0–5</p></figcaption>
+                    <div class="chart-box"><canvas id="chartMembers" role="img" aria-label="Gennemsnitlig rating pr. medlem"></canvas></div>
+                </figure>
+            </div>
+            <h3 class="sub-head">Top 3 pr. medlem</h3>
+            <div class="list-grid" id="memberTop"></div>
+        </div>
+    </section>
+
     <section class="stat-section" aria-labelledby="valueHead">
         <h2 id="valueHead">Mest for pengene</h2>
         <p class="section-lede">Kun øl med både pris og Røverne-rating.</p>

@@ -193,6 +193,7 @@ dialog.beer[open] { animation: pourIn .25s ease-out; }
 .stat-section > h2 small { font-family: 'Instrument Sans', sans-serif; font-size: .95rem; color: var(--foam-soft); margin-left: 8px; }
 .section-lede { margin: 0 0 20px; color: var(--foam-soft); max-width: 70ch; }
 .sub-head { margin: 28px 0 10px; font-size: 1.2rem; }
+#memberKpis { margin-bottom: 16px; }
 
 .chart-grid, .list-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
 .chart-card, .rank-card { margin: 0; min-width: 0; background: var(--bottle-raised); border: 1px solid var(--line); border-radius: 6px; padding: 18px; }
