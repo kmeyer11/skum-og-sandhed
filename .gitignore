@@ -420,3 +420,6 @@ client_secrets.json
 google-credentials.json
 *-credentials.json
 .env
+
+# Netlify CLI
+.netlify/

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistik &#x2013; Skum og Sandhed</title>
+    <link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/img/roeverne-ikon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/site.css?v=YH2RDrIlKdSEDQF_cWmo53wDUXV8F8XREcwIR_Fx36w" />
+</head>
+<body>
+    <nav class="site-nav" aria-label="Hovedmenu">
+        <a class="home" href="/"><img src="/img/roeverne-ikon.svg" alt="" width="28" height="28">Skum og Sandhed</a>
+        <a href="/">Arkivet</a>
+        <a href="/Statistik" aria-current="page">Statistik</a>
+        <a href="/Pejs">Pejsen</a>
+    </nav>
+
+    
+<header class="pour short">
+    <div class="bubbles" aria-hidden="true"></div>
+    <img class="badge" src="/img/roeverne-maerke.svg" alt="" width="200" height="200">
+    <h1>Tallene bag skummet</h1>
+</header>
+
+<main class="stats" id="stats" aria-busy="true">
+    <div class="year-picker" role="group" aria-label="Vælg år" id="yearPicker"></div>
+
+    <p class="stats-status" id="statsStatus">Henter øl fra arket…</p>
+
+    <section aria-labelledby="kpiHead">
+        <h2 id="kpiHead" class="sr-only">Nøgletal</h2>
+        <div class="kpis" id="kpis"></div>
+    </section>
+
+    <section class="stat-section" aria-labelledby="trendHead">
+        <h2 id="trendHead">Udvikling over årene</h2>
+        <p class="section-lede">Gennemsnit pr. smagning. Et hul i linjen betyder, at det år ikke er udfyldt i arket.</p>
+        <div class="chart-grid">
+            <figure class="chart-card wide">
+                <figcaption><h3>Rating pr. år</h3><p>Røvernes gennemsnit mod Untappd, skala 0–5</p></figcaption>
+                <div class="chart-box"><canvas id="chartRating" role="img" aria-label="Gennemsnitlig rating pr. år"></canvas></div>
+            </figure>
+            <figure class="chart-card">
+                <figcaption><h3>Pris pr. år</h3><p>Gennemsnitspris pr. øl i kr</p></figcaption>
+                <div class="chart-box"><canvas id="chartPrice" role="img" aria-label="Gennemsnitspris pr. år"></canvas></div>
+            </figure>
+            <figure class="chart-card">
+                <figcaption><h3>Styrke pr. år</h3><p>Gennemsnitlig alkoholprocent</p></figcaption>
+                <div class="chart-box"><canvas id="chartAbv" role="img" aria-label="Gennemsnitlig ABV pr. år"></canvas></div>
+            </figure>
+            <figure class="chart-card">
+                <figcaption><h3>Øl pr. år</h3><p>Antal øl på bordet</p></figcaption>
+                <div class="chart-box"><canvas id="chartCount" role="img" aria-label="Antal øl pr. år"></canvas></div>
+            </figure>
+        </div>
+        <details class="as-table">
+            <summary>Vis årene som tabel</summary>
+            <div class="table-scroll"><table class="data" id="yearTable"></table></div>
+        </details>
+    </section>
+
+    <section class="stat-section" aria-labelledby="topHead">
+        <h2 id="topHead">Top og bund <small id="topScope"></small></h2>
+        <p class="section-lede">Efter Røvernes rating. Klik på en øl for detaljer.</p>
+        <div class="list-grid">
+            <div class="rank-card"><h3>Bedste</h3><ol class="rank" id="topList"></ol></div>
+            <div class="rank-card"><h3>Værste</h3><ol class="rank" id="bottomList"></ol></div>
+        </div>
+        <div id="winnersWrap">
+            <h3 class="sub-head">Årets vinder og taber</h3>
+            <div class="table-scroll"><table class="data winners" id="winnersTable"></table></div>
+        </div>
+    </section>
+
+    <section class="stat-section" aria-labelledby="memberHead">
+        <h2 id="memberHead">Hver Røver for sig <small id="memberScope"></small></h2>
+        <p class="section-lede">Ud fra den rating, hvert medlem selv har givet. Kun øl, hvor ratings pr. medlem er skrevet ind i arket.</p>
+        <p class="stats-status" id="memberEmpty" hidden></p>
+        <div id="memberWrap">
+            <div class="kpis" id="memberKpis"></div>
+            <div class="chart-grid">
+                <figure class="chart-card wide">
+                    <figcaption><h3>Snit pr. medlem</h3><p>Fra mildest til strengest, skala 0–5</p></figcaption>
+                    <div class="chart-box"><canvas id="chartMembers" role="img" aria-label="Gennemsnitlig rating pr. medlem"></canvas></div>
+                </figure>
+            </div>
+            <h3 class="sub-head">Top 3 pr. medlem</h3>
+            <div class="list-grid" id="memberTop"></div>
+        </div>
+    </section>
+
+    <section class="stat-section" aria-labelledby="valueHead">
+        <h2 id="valueHead">Mest for pengene</h2>
+        <p class="section-lede">Kun øl med både pris og Røverne-rating.</p>
+        <div class="chart-grid">
+            <figure class="chart-card wide">
+                <figcaption><h3>Pris mod rating</h3><p>Er de dyre øl de bedste?</p></figcaption>
+                <div class="chart-box"><canvas id="chartValue" role="img" aria-label="Scatterplot af pris mod Røvernes rating"></canvas></div>
+            </figure>
+            <div class="rank-card"><h3>Bedst værdi</h3><p class="rank-note">Rating pr. 100 kr</p><ol class="rank" id="bestValue"></ol></div>
+            <div class="rank-card"><h3>Dyreste skuffelser</h3><p class="rank-note">Dyreste øl med rating under 3</p><ol class="rank" id="worstValue"></ol></div>
+        </div>
+    </section>
+
+    <section class="stat-section" aria-labelledby="typeHead">
+        <h2 id="typeHead">Typer og bryggerier</h2>
+        <div class="chart-grid">
+            <figure class="chart-card wide">
+                <figcaption><h3>Typer pr. år</h3><p>Antal øl med typen. En øl kan have flere typer.</p></figcaption>
+                <div class="table-scroll"><table class="data heat" id="typeHeat"></table></div>
+            </figure>
+            <figure class="chart-card">
+                <figcaption><h3>Rating pr. type</h3><p>Typer med mindst 3 bedømte øl</p></figcaption>
+                <div class="chart-box tall"><canvas id="chartTypes" role="img" aria-label="Gennemsnitlig Røverne-rating pr. øltype"></canvas></div>
+            </figure>
+            <div class="rank-card"><h3>Hyppigste bryggerier</h3><ol class="rank" id="breweryCount"></ol></div>
+            <div class="rank-card"><h3>Bedste bryggerier</h3><p class="rank-note">Mindst 2 bedømte øl</p><ol class="rank" id="breweryBest"></ol></div>
+        </div>
+    </section>
+</main>
+
+<dialog id="beerModal" class="beer" aria-labelledby="beerModalLabel">
+    <div class="d-head">
+        <button type="button" class="d-close" aria-label="Luk">×</button>
+        <h3 id="beerModalLabel"></h3>
+        <p id="beerBreweries"></p>
+    </div>
+    <div class="d-body">
+        <blockquote id="beerDescription"></blockquote>
+        <dl class="facts" id="beerFacts"></dl>
+        <dl class="ing" id="beerIngredients"></dl>
+    </div>
+</dialog>
+
+
+
+
+    <footer class="site-footer">Data fra Røvernes regneark.</footer>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/site.js?v=Y3n9WCYRnzrmeb9M3BDffWFhaZ6_H6dEy9scfaGuoS4"></script>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="/js/statistik.js?v=b0vXjoBk-yqsZkvv_IZGe9Ei-mnbYtj8SqN_n0wsqnA"></script>
+
+</body>
+</html>
