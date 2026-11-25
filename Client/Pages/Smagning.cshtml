@@ -1,0 +1,38 @@
+@page
+@model SmagningModel
+@{
+    ViewData["Title"] = "Ølsmagning";
+    ViewData["BodyClass"] = "smagning";
+}
+
+<main class="tasting" id="tasting" aria-busy="true">
+    <h1 class="sr-only" id="tastingTitle">Ølsmagning</h1>
+    <p class="tasting-status" id="tastingStatus">Henter øl fra arket…</p>
+
+    <section class="tasting-beer" id="tastingBeer" aria-live="polite" hidden>
+        <button type="button" class="arrow prev" id="prevBtn" aria-label="Forrige øl">←</button>
+        <div class="label-wrap">
+            <div class="label" id="beerLabel"></div>
+            <div class="label-side" id="beerSide"></div>
+        </div>
+        <button type="button" class="arrow next" id="nextBtn" aria-label="Næste øl">→</button>
+    </section>
+
+    <section class="tasting-end" id="tastingEnd" hidden>
+        <div class="end-head">
+            <div>
+                <h2>Skål!</h2>
+                <p id="endSummary"></p>
+            </div>
+            <div class="end-actions">
+                <button type="button" class="pill ghost" id="restartBtn">Start forfra</button>
+                <a class="pill" href="~/Statistik">Se statistikken</a>
+            </div>
+        </div>
+        <ol class="label-wall" id="labelWall"></ol>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/smagning.js" asp-append-version="true"></script>
+}

@@ -1,4 +1,4 @@
-// Fælles formattering, øl-dialogen og boblerne i heroen, brugt af både arkivet og statistiksiden.
+// Fælles formattering, øl-dialogen og boblerne i heroen, brugt af arkivet, statistikken og ølsmagningen.
 window.Skum = (function () {
     var esc = s => $('<div>').text(s ?? '').html();
     var num = (n, digits) => n.toLocaleString('da-DK', { minimumFractionDigits: digits, maximumFractionDigits: 2 });
@@ -54,5 +54,5 @@ window.Skum = (function () {
         dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
     });
 
-    return { esc, num, orDash, kr, pct, rating, year, text, openBeer };
+    return { esc, num, orDash, kr, pct, rating, year, text, tags, openBeer };
 })();
