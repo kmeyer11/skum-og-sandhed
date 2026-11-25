@@ -27,6 +27,9 @@ $(function () {
             beers = data.filter(b => b.drinkingYear > 0);
             beers.forEach(b => byId.set(b.beerId, b));
             years = [...new Set(beers.map(b => b.drinkingYear))].sort();
+            // Året står i #-delen, så ølsmagningens slutside kan linke direkte til årets tal.
+            var linked = Number(location.hash.slice(1));
+            if (years.includes(linked)) selected = linked;
             $('#statsStatus').remove();
             $('#stats').attr('aria-busy', 'false');
             buildYearPicker();
@@ -72,6 +75,7 @@ $(function () {
             $('#yearPicker .chip').each(function () {
                 this.setAttribute('aria-pressed', String($(this).data('year') == selected));
             });
+            history.replaceState(null, '', selected === 'all' ? location.pathname : '#' + selected);
             render();
         });
     }

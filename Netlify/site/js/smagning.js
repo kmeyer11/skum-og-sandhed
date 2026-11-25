@@ -20,6 +20,7 @@ $(function () {
 
             document.title = `Ølsmagning ${tastingYear} – Skum og Sandhed`;
             $('#tastingTitle').text(`Ølsmagning ${tastingYear}`);
+            $('#statsLink').prop('hash', String(tastingYear));
             $('#tasting').attr('aria-busy', 'false');
 
             if (!beers.length) {
