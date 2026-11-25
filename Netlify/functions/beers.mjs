@@ -3,7 +3,18 @@
 // Ændres mappingen dér, skal den også ændres her.
 import { createSign } from "node:crypto";
 
-export const config = { path: "/api/beers.json" };
+export const config = {
+  path: "/api/beers.json",
+  // Pr. IP, så et script i løkke får 429. Rigeligt til at alle til smagningen deler samme wifi.
+  rateLimit: { windowLimit: 60, windowSize: 60, aggregateBy: ["ip", "domain"] },
+};
+
+// Kort CDN-cache, så kald i løkke ikke rammer funktionen og Googles kvote hver gang.
+// Holdes kort, fordi øllene skrives ind i arket undervejs til smagningen og skal vises ved genindlæsning.
+const CACHE_HEADERS = {
+  "Cache-Control": "public, max-age=0, must-revalidate",
+  "Netlify-CDN-Cache-Control": "public, durable, max-age=15, stale-while-revalidate=45",
+};
 
 const DEFAULT_SPREADSHEET_ID = "141LDJNA1KpJpEULTmpme4MhyJkoZ9fRHmbnqYH4EKfs";
 const SCOPE = "https://www.googleapis.com/auth/spreadsheets.readonly";
@@ -11,10 +22,14 @@ const SCOPE = "https://www.googleapis.com/auth/spreadsheets.readonly";
 export default async () => {
   try {
     const beers = await loadBeers();
-    return Response.json(beers, { headers: { "Cache-Control": "no-store" } });
+    return Response.json(beers, { headers: CACHE_HEADERS });
   } catch (err) {
+    // Detaljerne kan indeholde Googles svar, så de skrives kun i funktionsloggen.
     console.error(err);
-    return Response.json({ title: "Kunne ikke hente øl fra Google Sheets", detail: err.message }, { status: 500 });
+    return Response.json(
+      { title: "Kunne ikke hente øl fra Google Sheets" },
+      { status: 500, headers: { "Cache-Control": "no-store" } },
+    );
   }
 };
 
