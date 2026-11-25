@@ -1,3 +1,13 @@
 [build]
   publish = "site"
   functions = "functions"
+
+# Chart.js og DataTables kommer fra CDN, skrifterne fra Google Fonts.
+# style-src kræver 'unsafe-inline', fordi siderne sætter style-attributter i den HTML, de bygger.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdn.datatables.net https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

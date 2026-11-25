@@ -2,6 +2,11 @@
 
 Statisk kopi af Client-siderne (`site/`) plus en Netlify Function (`functions/beers.mjs`), der læser Google Sheets ved hvert kald til `/api/beers.json`. Mappingen er en kopi af `Persistence/GoogleSheets/BeerLoaderService.cs`, så ret begge steder.
 
+## Beskyttelse
+
+- `/api/beers.json` har rate limit (60 kald i minuttet pr. IP) og 15 sekunders CDN-cache, begge i `functions/beers.mjs`.
+- `netlify.toml` sætter CSP og andre sikkerheds-headers. Inline `<script>` er blokeret, så sidens JS skal ligge i `site/js/`. Nye eksterne scripts eller skrifter skal tilføjes i CSP'en.
+
 ## Miljøvariabler (Netlify → Site configuration → Environment variables)
 
 | Navn | Værdi |
